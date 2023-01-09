@@ -41,10 +41,17 @@ inline void set_next(uint16_t& index, const uint16_t& target);
 
 class VirtualMachine {
 public:
-    VirtualMachine();
+    VirtualMachine(VirtualMachine &) = delete; /* prevent cloning */
+    void operator=(const VirtualMachine &) = delete;
+    static VirtualMachine *get();
+
     bool run(string& s_path);
     void extractText(string& d_path);
     void dumpAsm(string& d_path);
+
+protected:
+    static VirtualMachine *vm; /* Singleton */
+    VirtualMachine();
 
 private:
     VMState state;

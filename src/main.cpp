@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 
     fpath = string((argv[1]));
 
-    vm = new VirtualMachine();
+    vm = VirtualMachine::get();
 
     ret = vm->run(fpath);
 

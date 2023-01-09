@@ -3,9 +3,19 @@
 #include <iostream>
 #include <fstream>
 #include <iterator>
+#include <cinttypes>
 
 #include "Op.hpp"
 #include "VirtualMachine.hpp"
+
+VirtualMachine* VirtualMachine::vm = VirtualMachine::get();
+
+VirtualMachine* VirtualMachine::get() {
+    if (!vm)
+        vm = new VirtualMachine();
+
+    return vm;
+}
 
 VirtualMachine::VirtualMachine() {
     this->state = VM_INIT;
