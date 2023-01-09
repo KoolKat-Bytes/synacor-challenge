@@ -47,6 +47,9 @@ void VirtualMachine::dumpAsm(std::string& d_path) {
 
     /* print what is left in memory */
     auto last = this->ops.crbegin();
+    if (last == this->ops.rend())
+        return;
+
     int i = last->first;
     size_t msize = this->_memory.size();
 
