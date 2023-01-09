@@ -1,0 +1,3 @@
+A modest attempt to solve the synacor-challenge [here](https://challenge.synacor.com/).\
+The current solution, **compiles** and **runs**.\
+There are a lot of *improvements* to be done ...
