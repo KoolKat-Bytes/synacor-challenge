@@ -78,6 +78,6 @@ std::ostream& operator<<(std::ostream& os, Op const& op)
     }
 
     os << "->[" << std::setfill(' ') << std::setw(5) << op.next_addr << "] ";
-    
+
     return os;
 }

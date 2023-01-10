@@ -266,10 +266,10 @@ bool VirtualMachine::run(std::string& s_path) {
             this->state = VM_ERR_OUT_OF_MEMORY;
         }
     }
-    
+
     if(this->state == VM_ERR)
         return false;
-    
+
     return true;
 };
 
@@ -337,7 +337,7 @@ void VirtualMachine::_set(uint16_t& res, const uint16_t& val) {
 
     uint16_t& a = cast_res(res);
     uint16_t b = 0;
-    
+
     cast_val(b, val);
 
     a = b;
@@ -347,7 +347,7 @@ void VirtualMachine::_push(const uint16_t& val) {
     check_val(val);
 
     uint16_t a = 0;
-    
+
     cast_val(a, val);
 
     this->_stack.push(a);
@@ -375,7 +375,7 @@ void VirtualMachine::_eq(uint16_t& res, const uint16_t& l_val, const uint16_t& r
 
     uint16_t& a = cast_res(res);
     uint16_t b = 0, c = 0;
-    
+
     cast_val(b, l_val);
     cast_val(c, r_val);
 
