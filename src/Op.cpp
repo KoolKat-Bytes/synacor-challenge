@@ -6,10 +6,10 @@
 #include <iterator>
 #include <cinttypes>
 
-#include "Op.hpp"
 #include "VirtualMachine.hpp"
+#include "Op.hpp"
 
-const std::string opName(OpCode op_code) {
+std::string opName(OpCode op_code) {
     if (op_code == OP_HALT)
         return "halt";
     else if (op_code == OP_SET)
@@ -58,26 +58,65 @@ const std::string opName(OpCode op_code) {
     return "undefined";
 }
 
-std::ostream& operator<<(std::ostream& os, Op const& op)
-{
-    os << "[" << std::setfill(' ') << std::setw(5) << op.addr << "] ";
-    os << " " << opName(op.op_code);
+int arg_count(OpCode op_code) {
+    switch (op_code)
+    {
+    case OP_HALT:
+    case OP_NOOP:
+    case OP_RET:
+    default:
+        return 0;
 
-    for(auto it : op.args) {
-        os << " " << std::setfill(' ') << std::setw(5);
-        if(it >= REG_LOW && it <= REG_HIGH) {
-            os << " r" << (it % REG_LOW);
+    case OP_PUSH:
+    case OP_POP:
+    case OP_JMP:
+    case OP_CALL:
+    case OP_OUT:
+    case OP_IN:
+        return 1;
+
+    case OP_SET:
+    case OP_JT:
+    case OP_JF:
+    case OP_NOT:
+    case OP_RMEM:
+    case OP_WMEM:
+        return 2;
+
+    case OP_EQ:
+    case OP_GT:
+    case OP_ADD:
+    case OP_MULT:
+    case OP_MOD:
+    case OP_AND:
+    case OP_OR:
+        return 3;
+    }
+}
+
+bool is_op(const uint16_t& data) {
+    return(data >= OP_HALT && data <= OP_NOOP);
+};
+
+int decode_op(std::ostream &os, std::vector<uint16_t> mem, int& i) {
+    OpCode op_code = (OpCode) mem[i];
+    os << std::setfill(' ') << std::setw(5) << opName(op_code);
+    i++;
+
+    int N = arg_count(op_code);
+    for(int j = 0; j < N; j++) {
+        os << std::setfill(' ')<< std::setw(7);
+        uint16_t val = mem[i + j];
+        if(val >= REG_LOW && val <= REG_HIGH) {
+            os << "r" + std::to_string(val % REG_LOW);
         } else {
-            os << it;
-            if(op.op_code == OP_OUT && it >= 33 && it <= 126) {
-                os << " " << std::setfill(' ') << std::setw(24);
-                os << "; " << (char)it;
+            os << val;
+            if(op_code == OP_OUT && val >= 33 && val <= 126) {
+                os << " " << (char)val;
             }
         }
-        os << " ";
     }
+    os << std::setfill(' ') << std::setw(7) << "";
 
-    os << "->[" << std::setfill(' ') << std::setw(5) << op.next_addr << "] ";
-
-    return os;
+    return N - 1;
 }

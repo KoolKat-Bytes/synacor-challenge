@@ -30,7 +30,7 @@ enum VMState {
     VM_RUN,
     VM_HALT,
     VM_ERR,
-    VM_ERR_OUT_OF_MEMORY,
+    VM_ERR_BAD_MEMORY,
 };
 
 inline void no_operand_next(uint16_t& index);
@@ -57,7 +57,6 @@ private:
     VMState state;
 
     uint16_t pos;
-    map<uint16_t, Op*> ops;
 
     vector<uint16_t> _memory;
     vector<uint16_t> _registers;

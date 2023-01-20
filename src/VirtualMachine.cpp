@@ -112,18 +112,15 @@ bool VirtualMachine::run(std::string& s_path) {
     }
 
     /* start execution */
-    this->state = VM_RUN;
+    if (this->state == VM_INIT)
+        this->state = VM_RUN;
 
     const size_t msize = this->_memory.size();
     uint16_t &i = this->pos;
 
     while(this->state == VM_RUN) {
 
-        uint16_t op_code = this->_memory[i];
-        std::vector<uint16_t> args;
-        const uint16_t curr_addr = i;
-
-        switch(op_code)
+        switch(this->_memory[i])
         {
         case OP_HALT:
             this->_halt();
@@ -132,138 +129,107 @@ bool VirtualMachine::run(std::string& s_path) {
 
         case OP_SET:
             this->_set(this->_memory[i + 1], this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
             two_operand_next(i);
             break;
+
         case OP_PUSH:
             this->_push(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 1]);
             one_operand_next(i);
             break;
+
         case OP_POP:
             this->_pop(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 1]);
             one_operand_next(i);
             break;
+
         case OP_EQ:
             this->_eq(this->_memory[i + 1], this->_memory[i + 2], this->_memory[i + 3]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 3]);
             three_operand_next(i);
             break;
+
         case OP_GT:
             this->_gt(this->_memory[i + 1], this->_memory[i + 2], this->_memory[i + 3]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 3]);
             three_operand_next(i);
             break;
+
         case OP_JMP: /* have control over position */
             this->_jmp(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 1]);
             break;
+
         case OP_JT: /* have control over position */
             this->_jt(this->_memory[i + 1], this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
             break;
+
         case OP_JF: /* have control over position */
             this->_jf(this->_memory[i + 1], this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
             break;
+
         case OP_ADD:
             this->_add(this->_memory[i + 1], this->_memory[i + 2], this->_memory[i + 3]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 3]);
             three_operand_next(i);
             break;
+
         case OP_MULT:
             this->_mult(this->_memory[i + 1], this->_memory[i + 2], this->_memory[i + 3]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 3]);
             three_operand_next(i);
             break;
+
         case OP_MOD:
             this->_mod(this->_memory[i + 1], this->_memory[i + 2], this->_memory[i + 3]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 3]);
             three_operand_next(i);
             break;
+
         case OP_AND:
             this->_and(this->_memory[i + 1], this->_memory[i + 2], this->_memory[i + 3]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 3]);
             three_operand_next(i);
             break;
+
         case OP_OR:
             this->_or(this->_memory[i + 1], this->_memory[i + 2], this->_memory[i + 3]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 3]);
             three_operand_next(i);
             break;
+
         case OP_NOT:
             this->_not(this->_memory[i + 1], this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
             two_operand_next(i);
             break;
+
         case OP_RMEM:
             this->_rmem(this->_memory[i + 1], this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
             two_operand_next(i);
             break;
+
         case OP_WMEM:
             this->_wmem(this->_memory[i + 1], this->_memory[i + 2]);
-            args.push_back(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 2]);
             two_operand_next(i);
             break;
+
         case OP_CALL: /* have control over position */
             this->_call(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 1]);
             break;
+
         case OP_RET: /* have control over position */
             this->_ret();
             break;
+
         case OP_OUT:
             this->_out(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 1]);
             one_operand_next(i);
             break;
+
         case OP_IN:
             this->_in(this->_memory[i + 1]);
-            args.push_back(this->_memory[i + 1]);
             one_operand_next(i);
             break;
+
         case OP_NOOP:
             this->_noop();
             no_operand_next(i);
             break;
 
-        default: /* raw memory: not an operation, just data */
-            no_operand_next(i);
-            break;
-        }
-
-        if(is_op(op_code)) {
-            this->ops[curr_addr] = new Op(curr_addr, (OpCode) op_code, i, args);
-
-            if(!args.size())
-                args.clear();
-        }
-
-        if(i >= msize) {
-            std::cerr << "Out of memory" << std::endl;
-            this->state = VM_ERR_OUT_OF_MEMORY;
+        default: /* while running the program we should never be here */
+            this->state = VM_ERR_BAD_MEMORY;
+            continue;
         }
     }
 
@@ -592,7 +558,7 @@ void VirtualMachine::_in(uint16_t& res) {
 
     uint16_t& a = cast_res(res);
 
-    a = (char) getchar();
+    a = (char) std::cin.get();
 }
 
 void VirtualMachine::_noop() {
