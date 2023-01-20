@@ -8,6 +8,8 @@
 #include "Op.hpp"
 #include "VirtualMachine.hpp"
 
+using namespace std;
+
 VirtualMachine* VirtualMachine::vm = VirtualMachine::get();
 
 VirtualMachine* VirtualMachine::get() {
@@ -23,13 +25,13 @@ VirtualMachine::VirtualMachine() {
     this->_registers = vector<uint16_t>(REG_COUNT);
 }
 
-void VirtualMachine::extractText(std::string& d_path) {
+void VirtualMachine::extractText(string& d_path) {
     ofstream os;
 
     os.open(d_path);
 
     if(!os.is_open()) {
-        std::cerr << "failed to open: '" << d_path << "'" << std::endl;
+        cerr << "failed to open: '" << d_path << "'" << endl;
         return;
     }
 
@@ -41,13 +43,13 @@ void VirtualMachine::extractText(std::string& d_path) {
     os.close();
 }
 
-void VirtualMachine::dumpAsm(std::string& d_path) {
+void VirtualMachine::dumpAsm(string& d_path) {
     ofstream os;
 
     os.open(d_path);
 
     if(!os.is_open()) {
-        std::cerr << "failed to open: '" << d_path << "'" << std::endl;
+        cerr << "failed to open: '" << d_path << "'" << endl;
         return;
     }
 
@@ -78,21 +80,21 @@ void VirtualMachine::dumpAsm(std::string& d_path) {
     os.close();
 }
 
-bool VirtualMachine::loadFile(std::string& s_path) {
+void VirtualMachine::set_playfile(string& p_path) {
     ifstream is;
 
-    is.open(s_path, std::ios::binary);
+    is.open(s_path, ios::binary);
 
     if(!is.is_open()) {
-        std::cerr << "failed to open: '" << s_path << "'" << std::endl;
+        cerr << "failed to open: '" << s_path << "'" << endl;
         return false;
     }
 
-    std::streampos fsize;
+    streampos fsize;
 
-    is.seekg(0, std::ios::end);
+    is.seekg(0, ios::end);
     fsize = is.tellg();
-    is.seekg(0, std::ios::beg);
+    is.seekg(0, ios::beg);
 
     // NOTE: assuming file size is no more than MEMORY SIZE
     // TODO: read chunk by chunk otherwise
@@ -104,10 +106,10 @@ bool VirtualMachine::loadFile(std::string& s_path) {
     return true;
 }
 
-bool VirtualMachine::run(std::string& s_path) {
+bool VirtualMachine::run(string& s_path) {
 
     if(!this->loadFile(s_path)) {
-        std::cerr << "Failed to load file to the virtual machine" << std::endl;
+        cerr << "Failed to load file to the virtual machine" << endl;
         return false;
     }
 
@@ -246,7 +248,7 @@ bool VirtualMachine::run(std::string& s_path) {
 
 inline void VirtualMachine::check_val(uint16_t& val) {
     if (val >= INVALID_LOW_END) {
-        std::cerr << "invalid data:" << val << std::endl;
+        cerr << "invalid data:" << val << endl;
         this->state = VM_ERR;
         return;
     }
@@ -321,7 +323,7 @@ void VirtualMachine::_push(const uint16_t& val) {
 
 void VirtualMachine::_pop(uint16_t& res) {
     if(!this->_stack.size()) {
-        std::cerr << "empty stack" << std::endl;
+        cerr << "empty stack" << endl;
         this->state = VM_ERR;
         return;
     }
@@ -550,7 +552,7 @@ void VirtualMachine::_out(const uint16_t& val) {
 
     cast_val(a, val);
 
-    std::cout << (char) a;
+    cout << (char) a;
 }
 
 void VirtualMachine::_in(uint16_t& res) {
@@ -558,7 +560,8 @@ void VirtualMachine::_in(uint16_t& res) {
 
     uint16_t& a = cast_res(res);
 
-    a = (char) std::cin.get();
+
+    a = (char) cin.get();
 }
 
 void VirtualMachine::_noop() {
