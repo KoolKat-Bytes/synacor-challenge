@@ -20,6 +20,7 @@
 #include <string>
 #include <stack>
 #include <map>
+#include <fstream>
 
 #include "Op.hpp"
 
@@ -28,6 +29,7 @@ using namespace std;
 enum VMState {
     VM_INIT = 0,
     VM_RUN,
+    VM_PLAYING_FILE,
     VM_HALT,
     VM_ERR,
     VM_ERR_BAD_MEMORY,
@@ -49,18 +51,32 @@ public:
     void extractText(string& d_path);
     void dumpAsm(string& d_path);
 
+    void set_playfile(string &p_path);
+
 protected:
     static VirtualMachine *vm; /* Singleton */
     VirtualMachine();
+
+    /* signal handling */
+    static void s_interrupt(int sig) {
+        vm->interrupt(sig);
+    }
+    void interrupt(int sig);
+    void hack_mode();
 
 private:
     VMState state;
 
     uint16_t pos;
+    map<uint16_t, uint16_t> mem_hacks;
+    map<uint16_t, uint16_t> reg_hacks;
 
     vector<uint16_t> _memory;
     vector<uint16_t> _registers;
     stack<uint16_t> _stack;
+
+    std::ifstream ifs;
+    std::streambuf *cin_backup;
 
     /* helpers */
     bool loadFile(string& s_path);
