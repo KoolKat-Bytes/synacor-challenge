@@ -16,3 +16,5 @@ file(GLOB SRCS
 add_executable(synacor-vm ${SRCS})
 
 add_subdirectory(ConfirmationAlgo)
+
+add_subdirectory(CrackVaultKey)
